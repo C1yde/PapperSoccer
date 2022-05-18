@@ -28,6 +28,14 @@ public class PointScript : MonoBehaviour
 
     private void OnMouseExit()
     {
+        var position = spriteRenderer.transform.position;
+        var currentPosition = new Vector3(position.x + 0.05f, position.y + 0.05f, 1);
+
+        if (fieldScript._activePoints.Contains(currentPosition))
+        {
+            return;
+        }
+
         var texture = Resources.Load<Texture2D>("Sprites/gray_circle");
         var sprite = Sprite.Create(
             texture,
@@ -41,14 +49,16 @@ public class PointScript : MonoBehaviour
     {
         var position = spriteRenderer.transform.position;
         var lastPosition = fieldScript._points.Last();
+        var newPosition = new Vector3(position.x + 0.05f, position.y + 0.05f, 1);
 
-        if (Math.Abs(position.x - lastPosition.x) > 1
-            || Math.Abs(position.y - lastPosition.y) > 1)
+        if (Math.Abs(position.x - lastPosition.x) > 1.05
+            || Math.Abs(position.y - lastPosition.y) > 1.05)
         {
             return;
         }
 
-        fieldScript._points.Add(new Vector3(position.x + 0.05f, position.y + 0.05f, 1));
+        fieldScript._activePoints.Add(newPosition);
+        fieldScript._points.Add(newPosition);
         fieldScript._lineRenderer.positionCount = fieldScript._points.Count;
 
         var index = 0;

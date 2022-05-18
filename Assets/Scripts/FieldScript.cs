@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class FieldScript : MonoBehaviour
 {
     public List<Vector3> _points = new();
+    public HashSet<Vector3> _activePoints = new();
     public LineRenderer _lineRenderer;
 
     // Start is called before the first frame update
@@ -13,6 +15,9 @@ public class FieldScript : MonoBehaviour
         var blackCircleTexture = Resources.Load<Texture2D>("Sprites/black_circle");
 
         var points = new List<GameObject>();
+
+        _points.Add(new Vector3(0.05f, 0.05f, 1));
+        _activePoints.Add(new Vector3(0.05f, 0.05f, 1));
 
         for (var x = -3; x < 4; x++)
         {
@@ -34,21 +39,15 @@ public class FieldScript : MonoBehaviour
                     name = x + ", " + y
                 };
 
-                if (x != 0 || y != 0)
-                {
-                    gameObject.AddComponent<PointScript>();
-                    gameObject.AddComponent<CircleCollider2D>();
-                }
-                else
-                {
-                    _lineRenderer = gameObject.AddComponent<LineRenderer>();
-                    _lineRenderer.material.color = Color.gray;
-                    _lineRenderer.startWidth = 0.1f;
-                    _lineRenderer.endWidth = 0.1f;
-                    _lineRenderer.generateLightingData = true;
+                gameObject.AddComponent<PointScript>();
+                gameObject.AddComponent<CircleCollider2D>();
 
-                    _points.Add(new Vector3(x + 0.05f, y + 0.05f, 1));
-                }
+                _lineRenderer = gameObject.AddComponent<LineRenderer>();
+                _lineRenderer.material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Line.mat");
+                _lineRenderer.startColor = Color.blue;
+                _lineRenderer.endColor = Color.blue;
+                _lineRenderer.startWidth = 0.1f;
+                _lineRenderer.endWidth = 0.1f;
 
                 gameObject.AddComponent<SpriteRenderer>();
 
