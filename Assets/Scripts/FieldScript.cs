@@ -47,7 +47,7 @@ public class FieldScript : MonoBehaviour
                     _lineRenderer.endWidth = 0.1f;
                     _lineRenderer.generateLightingData = true;
 
-                    _points.Add(new Vector3(x, y, 1));
+                    _points.Add(new Vector3(x + 0.05f, y + 0.05f, 1));
                 }
 
                 gameObject.AddComponent<SpriteRenderer>();
@@ -67,7 +67,7 @@ public class FieldScript : MonoBehaviour
                 var sprite = Sprite.Create(
                     grayCircleTexture,
                     new Rect(0.0f, 0.0f, grayCircleTexture.width, grayCircleTexture.height),
-                    new Vector2(1f, 1f));
+                    new Vector2(0.32f, 0.32f));
 
                 var gameObject = new GameObject
                 {

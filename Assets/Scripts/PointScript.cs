@@ -48,7 +48,7 @@ public class PointScript : MonoBehaviour
             return;
         }
 
-        fieldScript._points.Add(new Vector3(position.x, position.y, 1));
+        fieldScript._points.Add(new Vector3(position.x + 0.05f, position.y + 0.05f, 1));
         fieldScript._lineRenderer.positionCount = fieldScript._points.Count;
 
         var index = 0;
