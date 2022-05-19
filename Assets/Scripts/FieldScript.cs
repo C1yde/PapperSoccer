@@ -11,6 +11,8 @@ public class FieldScript : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        DrawFieldBorders();
+
         var grayCircleTexture = Resources.Load<Texture2D>("Sprites/gray_circle");
         var blackCircleTexture = Resources.Load<Texture2D>("Sprites/black_circle");
 
@@ -79,6 +81,91 @@ public class FieldScript : MonoBehaviour
                 spriteRenderer.sortingOrder = 1;
                 spriteRenderer.transform.position = new Vector3(x, y);
             }
+        }
+    }
+
+    private void DrawFieldBorders()
+    {
+        var gameObject = new GameObject();
+        gameObject.name = "border-line";
+        var lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Line.mat");
+        lineRenderer.startColor = Color.blue;
+        lineRenderer.endColor = Color.blue;
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+        var index = 0;
+
+        void DrawLine(int x, int y)
+        {
+            gameObject.name = "border" + x + ", " + y;
+            var point = new Vector3(x + 0.05f, y + 0.05f, 2);
+
+            lineRenderer.positionCount++;
+            lineRenderer.SetPosition(index++, point);
+        }
+
+        var x = -3;
+        var y = -3;
+
+        for (; y <= 2; y++)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; x <= -2; x++)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; y <= 3; y++)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; x <= 0; x++)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; y >= 4; y--)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; x <= 2; x++)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; y >= -2; y--)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; x >= 2; x--)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; y >= -3; y--)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; x >= 0; x--)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; y <= -4; y++)
+        {
+            DrawLine(x, y);
+        }
+
+        for (; x >= -3; x--)
+        {
+            DrawLine(x, y);
         }
     }
 
