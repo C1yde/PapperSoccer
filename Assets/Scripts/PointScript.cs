@@ -6,6 +6,7 @@ public class PointScript : MonoBehaviour
 {
     public FieldScript fieldScript;
     public SpriteRenderer spriteRenderer;
+    public MovementLogic movementLogic;
 
     private void Start()
     {
@@ -13,6 +14,7 @@ public class PointScript : MonoBehaviour
         fieldScript = GameObject
             .FindGameObjectWithTag("GameController")
             .GetComponent<FieldScript>();
+        movementLogic = new MovementLogic();
     }
 
     private void OnMouseOver()
@@ -75,5 +77,8 @@ public class PointScript : MonoBehaviour
             fieldScript._lineRenderer.SetPosition(index, point);
             index++;
         }
+
+        fieldScript._player1 = !fieldScript._player1;
+        fieldScript.DrawPlayerSprite();
     }
 }

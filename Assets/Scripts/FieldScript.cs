@@ -8,18 +8,24 @@ public class FieldScript : MonoBehaviour
     private Material _material;
     private Sprite _blackCircleSprite;
     private Sprite _grayCircleSprite;
+    private Sprite _p1Sprite;
+    private Sprite _p2Sprite;
+    private SpriteRenderer _playerSpriteRenderer;
 
     public List<Vector3> _activePoints = new();
     public LineRenderer _lineRenderer;
+    public bool _player1 = true;
 
     [RuntimeInitializeOnLoadMethod]
     private void Start()
     {
         var blackCircleTexture = Resources.Load<Texture2D>("Sprites/black_circle");
         var grayCircleTexture = Resources.Load<Texture2D>("Sprites/gray_circle");
+        var p1 = Resources.Load<Texture2D>("Sprites/p1");
+        var p2 = Resources.Load<Texture2D>("Sprites/p2");
 
         _parent = GetComponent<Canvas>();
-        _material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Line.mat");
+        _material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Particle.mat");
         _blackCircleSprite = Sprite.Create(
             blackCircleTexture,
             new Rect(0, 0, blackCircleTexture.width, blackCircleTexture.height),
@@ -28,9 +34,30 @@ public class FieldScript : MonoBehaviour
             grayCircleTexture,
             new Rect(0, 0, grayCircleTexture.width, grayCircleTexture.height),
             new Vector2(0.32f, 0.32f));
+        _p1Sprite = Sprite.Create(
+            p1,
+            new Rect(0, 0, p1.width, p1.height),
+            new Vector2(0.64f, 0.64f));
+        _p2Sprite = Sprite.Create(
+            p2,
+            new Rect(0, 0, p2.width, p2.height),
+            new Vector2(0.64f, 0.64f));
 
         DrawFieldDots();
         DrawFieldBorders();
+        DrawPlayerSprite();
+    }
+
+    public void DrawPlayerSprite()
+    {
+        if (_playerSpriteRenderer == null)
+        {
+            var gameObject = new GameObject("player");
+            _playerSpriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+            _playerSpriteRenderer.transform.position = new Vector3(-4.5f, 4.5f, 1);
+        }
+
+        _playerSpriteRenderer.sprite = _player1 ? _p1Sprite : _p2Sprite;
     }
 
     private void DrawFieldDots()
@@ -45,22 +72,13 @@ public class FieldScript : MonoBehaviour
             }
         }
 
-        for (var x = -1; x < 2; x++)
-        {
-            foreach (var y in new int[] { 4, -4 })
-            {
-                CreateDot(x, y);
-            }
-        }
+        CreateDot(0, 4);
+        CreateDot(0, -4);
     }
 
     private void CreateDot(int x, int y)
     {
-        var gameObject = new GameObject
-        {
-            name = x + ", " + y
-        };
-
+        var gameObject = new GameObject(x + ", " + y);
         gameObject.transform.SetParent(_parent.transform, true);
 
         gameObject.AddComponent<PointScript>();
@@ -73,6 +91,7 @@ public class FieldScript : MonoBehaviour
             _lineRenderer = gameObject.AddComponent<LineRenderer>();
             _lineRenderer.material = _material;
             _lineRenderer.startColor = _lineRenderer.endColor = Color.blue;
+            _lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
             _lineRenderer.startWidth = _lineRenderer.endWidth = 0.1f;
 
             sprite = _blackCircleSprite;
@@ -85,11 +104,12 @@ public class FieldScript : MonoBehaviour
 
     private void DrawFieldBorders()
     {
-        var borderDot = GameObject.Find("-3, -3");
+        var borderDot = new GameObject("border");
         var lineRenderer = borderDot.AddComponent<LineRenderer>();
 
         lineRenderer.material = _material;
         lineRenderer.startColor = lineRenderer.endColor = Color.black;
+        lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
         lineRenderer.startWidth = lineRenderer.endWidth = 0.1f;
         lineRenderer.positionCount = 0;
 
