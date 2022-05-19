@@ -11,7 +11,7 @@ public class PointScript : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         fieldScript = GameObject
-            .FindGameObjectWithTag("MainCamera")
+            .FindGameObjectWithTag("GameController")
             .GetComponent<FieldScript>();
     }
 

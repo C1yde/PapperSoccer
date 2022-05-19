@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FieldScript : MonoBehaviour
 {
+    private Canvas _parent;
     private Material _material;
     private Sprite _blackCircleSprite;
     private Sprite _grayCircleSprite;
@@ -17,6 +18,7 @@ public class FieldScript : MonoBehaviour
         var blackCircleTexture = Resources.Load<Texture2D>("Sprites/black_circle");
         var grayCircleTexture = Resources.Load<Texture2D>("Sprites/gray_circle");
 
+        _parent = GetComponent<Canvas>();
         _material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Line.mat");
         _blackCircleSprite = Sprite.Create(
             blackCircleTexture,
@@ -58,6 +60,8 @@ public class FieldScript : MonoBehaviour
         {
             name = x + ", " + y
         };
+
+        gameObject.transform.SetParent(_parent.transform, true);
 
         gameObject.AddComponent<PointScript>();
         gameObject.AddComponent<CircleCollider2D>();
