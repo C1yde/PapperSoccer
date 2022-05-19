@@ -6,7 +6,7 @@ public class MainMenuControls : MonoBehaviour
     public void PlayPressed()
     {
         Debug.Log("Scene changed");
-        SceneManager.LoadScene("FieldScene");
+        SceneManager.LoadScene("GameScene");
     }
 
     public void ExitPressed()

@@ -11,7 +11,7 @@ public class FieldScript : MonoBehaviour
     public List<Vector3> _activePoints = new();
     public LineRenderer _lineRenderer;
 
-    // Start is called before the first frame update
+    [RuntimeInitializeOnLoadMethod]
     private void Start()
     {
         var blackCircleTexture = Resources.Load<Texture2D>("Sprites/black_circle");
