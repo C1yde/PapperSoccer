@@ -17,6 +17,15 @@ public class PointScript : MonoBehaviour
 
     private void OnMouseOver()
     {
+        var currentPosition = spriteRenderer.transform.position;
+        var lastPosition = fieldScript._activePoints.Last();
+
+        if (Math.Abs(currentPosition.x - lastPosition.x) > 1.05
+            || Math.Abs(currentPosition.y - lastPosition.y) > 1.05)
+        {
+            return;
+        }
+
         var texture = Resources.Load<Texture2D>("Sprites/black_circle");
         var sprite = Sprite.Create(
             texture,
@@ -28,10 +37,10 @@ public class PointScript : MonoBehaviour
 
     private void OnMouseExit()
     {
-        var position = spriteRenderer.transform.position;
-        var currentPosition = new Vector3(position.x + 0.05f, position.y + 0.05f, 1);
+        var currentPosition = spriteRenderer.transform.position;
+        var middlePosition = new Vector3(0, 0, 1);
 
-        if (fieldScript._activePoints.Contains(currentPosition))
+        if (middlePosition == currentPosition)
         {
             return;
         }
@@ -47,22 +56,21 @@ public class PointScript : MonoBehaviour
 
     private void OnMouseDown()
     {
-        var position = spriteRenderer.transform.position;
-        var lastPosition = fieldScript._points.Last();
-        var newPosition = new Vector3(position.x + 0.05f, position.y + 0.05f, 1);
+        var currentPosition = spriteRenderer.transform.position;
+        var lastPosition = fieldScript._activePoints.Last();
+        var newPosition = new Vector3(currentPosition.x + 0.05f, currentPosition.y + 0.05f, 1);
 
-        if (Math.Abs(position.x - lastPosition.x) > 1.05
-            || Math.Abs(position.y - lastPosition.y) > 1.05)
+        if (Math.Abs(currentPosition.x - lastPosition.x) > 1.05
+            || Math.Abs(currentPosition.y - lastPosition.y) > 1.05)
         {
             return;
         }
 
         fieldScript._activePoints.Add(newPosition);
-        fieldScript._points.Add(newPosition);
-        fieldScript._lineRenderer.positionCount = fieldScript._points.Count;
+        fieldScript._lineRenderer.positionCount = fieldScript._activePoints.Count;
 
         var index = 0;
-        foreach (var point in fieldScript._points)
+        foreach (var point in fieldScript._activePoints)
         {
             fieldScript._lineRenderer.SetPosition(index, point);
             index++;
