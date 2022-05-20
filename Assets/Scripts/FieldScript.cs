@@ -6,8 +6,6 @@ public class FieldScript : MonoBehaviour
 {
     private Canvas _parent;
     private Material _material;
-    private Sprite _blackCircleSprite;
-    private Sprite _grayCircleSprite;
     private Sprite _p1Sprite;
     private Sprite _p2Sprite;
     private SpriteRenderer _playerSpriteRenderer;
@@ -17,22 +15,24 @@ public class FieldScript : MonoBehaviour
     public List<Vector3> Points { get; set; } = new();
     public List<Vector3> BorderPoints { get; set; } = new();
     public Dictionary<Vector3, List<Vector3>> LinesDict { get; set; } = new();
+    public Sprite BallSprite { get; set; }
+    public Sprite GrayCircleSprite { get; set; }
 
     [RuntimeInitializeOnLoadMethod]
     private void Start()
     {
-        var blackCircleTexture = Resources.Load<Texture2D>("Sprites/black_circle");
+        var ballTexture = Resources.Load<Texture2D>("Sprites/ball");
         var grayCircleTexture = Resources.Load<Texture2D>("Sprites/gray_circle");
         var p1 = Resources.Load<Texture2D>("Sprites/p1");
         var p2 = Resources.Load<Texture2D>("Sprites/p2");
 
         _parent = GetComponent<Canvas>();
         _material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Particle.mat");
-        _blackCircleSprite = Sprite.Create(
-            blackCircleTexture,
-            new Rect(0, 0, blackCircleTexture.width, blackCircleTexture.height),
+        BallSprite = Sprite.Create(
+            ballTexture,
+            new Rect(0, 0, ballTexture.width, ballTexture.height),
             new Vector2(0.32f, 0.32f));
-        _grayCircleSprite = Sprite.Create(
+        GrayCircleSprite = Sprite.Create(
             grayCircleTexture,
             new Rect(0, 0, grayCircleTexture.width, grayCircleTexture.height),
             new Vector2(0.32f, 0.32f));
@@ -88,7 +88,7 @@ public class FieldScript : MonoBehaviour
         collider.offset = new Vector2(0.05f, 0.05f);
         collider.radius = 0.40f;
 
-        var sprite = _grayCircleSprite;
+        var sprite = GrayCircleSprite;
         var position = new Vector3(x, y, 1);
         if (x == 0 && y == 0)
         {
@@ -101,7 +101,7 @@ public class FieldScript : MonoBehaviour
             LineRenderer.positionCount = 1;
             LineRenderer.SetPosition(0, position);
 
-            sprite = _blackCircleSprite;
+            sprite = BallSprite;
         }
 
         var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();

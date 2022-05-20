@@ -30,13 +30,7 @@ public class PointScript : MonoBehaviour
             return;
         }
 
-        var texture = Resources.Load<Texture2D>("Sprites/black_circle");
-        var sprite = Sprite.Create(
-            texture,
-            new Rect(0.0f, 0.0f, texture.width, texture.height),
-            new Vector2(0.32f, 0.32f));
-
-        _spriteRenderer.sprite = sprite;
+        _spriteRenderer.sprite = _fieldScript.BallSprite;
     }
 
     private void OnMouseExit()
@@ -57,13 +51,8 @@ public class PointScript : MonoBehaviour
 
         var pointToReset = GameObject.Find(position.x + ", " + position.y);
         var spriteRenderer = pointToReset.GetComponent<SpriteRenderer>();
-        var texture = Resources.Load<Texture2D>("Sprites/gray_circle");
-        var sprite = Sprite.Create(
-            texture,
-            new Rect(0.0f, 0.0f, texture.width, texture.height),
-            new Vector2(0.32f, 0.32f));
 
-        spriteRenderer.sprite = sprite;
+        spriteRenderer.sprite = _fieldScript.GrayCircleSprite;
     }
 
     private void OnMouseDown()
