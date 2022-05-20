@@ -66,7 +66,8 @@ public class PointScript : MonoBehaviour
             currentPosition.y + 0.05f,
             1);
 
-        if (!IsNearPoint(currentPosition, lastPosition)
+        if (currentPosition == lastPosition
+            || !IsNearPoint(currentPosition, lastPosition)
             || IsPointFinished(currentPosition)
             || IsLineExisted(lastPosition, currentPosition))
         {
