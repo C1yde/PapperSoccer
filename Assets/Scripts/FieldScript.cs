@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Threading;
+
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FieldScript : MonoBehaviour
 {
@@ -45,6 +48,10 @@ public class FieldScript : MonoBehaviour
             new Rect(0, 0, p2.width, p2.height),
             new Vector2(0.64f, 0.64f));
 
+        var playerObject = new GameObject("player");
+        _playerSpriteRenderer = playerObject.AddComponent<SpriteRenderer>();
+        _playerSpriteRenderer.transform.position = new Vector3(-4.5f, 4.5f, 1);
+
         DrawFieldDots();
         DrawFieldBorders();
         DrawPlayerSprite();
@@ -52,14 +59,25 @@ public class FieldScript : MonoBehaviour
 
     public void DrawPlayerSprite()
     {
-        if (_playerSpriteRenderer == null)
-        {
-            var gameObject = new GameObject("player");
-            _playerSpriteRenderer = gameObject.AddComponent<SpriteRenderer>();
-            _playerSpriteRenderer.transform.position = new Vector3(-4.5f, 4.5f, 1);
-        }
-
         _playerSpriteRenderer.sprite = Player1 ? _p1Sprite : _p2Sprite;
+    }
+
+    public void DrawGoalSprite()
+    {
+        var goal = Resources.Load<Texture2D>("Sprites/goal");
+        var goalObject = new GameObject("goal");
+        var goalSprite = Sprite.Create(
+            goal,
+            new Rect(0, 0, goal.width, goal.height),
+            new Vector2(0.9f, 0.9f));
+        _playerSpriteRenderer = goalObject.AddComponent<SpriteRenderer>();
+        _playerSpriteRenderer.transform.position = new Vector3(2, 1, 0);
+        _playerSpriteRenderer.sprite = goalSprite;
+    }
+
+    IEnumerator<WaitForSeconds> Fade()
+    {
+        yield return new WaitForSeconds(2);
     }
 
     private void DrawFieldDots()
