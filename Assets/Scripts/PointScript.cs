@@ -1,29 +1,31 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class PointScript : MonoBehaviour
 {
-    public FieldScript fieldScript;
-    public SpriteRenderer spriteRenderer;
-    public MovementLogic movementLogic;
+    private FieldScript _fieldScript;
+    private SpriteRenderer _spriteRenderer;
+    private MovementLogic _movementLogic;
 
     private void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        fieldScript = GameObject
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _fieldScript = GameObject
             .FindGameObjectWithTag("GameController")
             .GetComponent<FieldScript>();
-        movementLogic = new MovementLogic();
+        _movementLogic = new MovementLogic();
     }
 
     private void OnMouseOver()
     {
-        var currentPosition = spriteRenderer.transform.position;
-        var lastPosition = fieldScript._activePoints.Last();
+        var currentPosition = _spriteRenderer.transform.position;
+        var lastPosition = _fieldScript.Points.Any()
+            ? _fieldScript.Points.Last()
+            : new Vector3(0, 0, 1);
 
-        if (Math.Abs(currentPosition.x - lastPosition.x) > 1.05
-            || Math.Abs(currentPosition.y - lastPosition.y) > 1.05)
+        if (!IsNearPoint(currentPosition, lastPosition))
         {
             return;
         }
@@ -34,19 +36,27 @@ public class PointScript : MonoBehaviour
             new Rect(0.0f, 0.0f, texture.width, texture.height),
             new Vector2(0.32f, 0.32f));
 
-        spriteRenderer.sprite = sprite;
+        _spriteRenderer.sprite = sprite;
     }
 
     private void OnMouseExit()
     {
-        var currentPosition = spriteRenderer.transform.position;
-        var middlePosition = new Vector3(0, 0, 1);
+        var currentPosition = _spriteRenderer.transform.position;
+        ResetPoint(currentPosition);
+    }
 
-        if (middlePosition == currentPosition)
+    private void ResetPoint(Vector3 position)
+    {
+        var lastPosition = _fieldScript.Points.Any()
+            ? _fieldScript.Points.Last()
+            : new Vector3(0, 0, 1);
+        if (position == lastPosition)
         {
             return;
         }
 
+        var pointToReset = GameObject.Find(position.x + ", " + position.y);
+        var spriteRenderer = pointToReset.GetComponent<SpriteRenderer>();
         var texture = Resources.Load<Texture2D>("Sprites/gray_circle");
         var sprite = Sprite.Create(
             texture,
@@ -58,27 +68,79 @@ public class PointScript : MonoBehaviour
 
     private void OnMouseDown()
     {
-        var currentPosition = spriteRenderer.transform.position;
-        var lastPosition = fieldScript._activePoints.Last();
-        var newPosition = new Vector3(currentPosition.x + 0.05f, currentPosition.y + 0.05f, 1);
+        var currentPosition = _spriteRenderer.transform.position;
+        var lastPosition = _fieldScript.Points.Any()
+            ? _fieldScript.Points.Last()
+            : new Vector3(0, 0, 1);
+        var newPosition = new Vector3(
+            currentPosition.x + 0.05f,
+            currentPosition.y + 0.05f,
+            1);
 
-        if (Math.Abs(currentPosition.x - lastPosition.x) > 1.05
-            || Math.Abs(currentPosition.y - lastPosition.y) > 1.05)
+        if (!IsNearPoint(currentPosition, lastPosition)
+            || IsPointFinished(currentPosition)
+            || IsLineExisted(lastPosition, currentPosition))
         {
             return;
         }
 
-        fieldScript._activePoints.Add(newPosition);
-        fieldScript._lineRenderer.positionCount = fieldScript._activePoints.Count;
+        _fieldScript.LinesDict[lastPosition].Add(currentPosition);
+        _fieldScript.Points.Add(currentPosition);
+        _fieldScript.LineRenderer.positionCount++;
+        _fieldScript.LineRenderer.SetPosition(
+            _fieldScript.LineRenderer.positionCount - 1,
+            newPosition);
 
-        var index = 0;
-        foreach (var point in fieldScript._activePoints)
+        _fieldScript.Player1 = !_fieldScript.Player1;
+        _fieldScript.DrawPlayerSprite();
+
+        ResetPoint(lastPosition);
+    }
+
+    private static bool IsNearPoint(
+        Vector3 currentPosition,
+        Vector3 lastPosition)
+    {
+        return Math.Abs(currentPosition.x - lastPosition.x) <= 1
+            && Math.Abs(currentPosition.y - lastPosition.y) <= 1;
+    }
+
+    private bool IsPointFinished(Vector3 position)
+    {
+        var anglePositions = new List<Vector3>
         {
-            fieldScript._lineRenderer.SetPosition(index, point);
-            index++;
+            new Vector3(-3, -3, 1),
+            new Vector3(-3, 3, 1),
+            new Vector3(3, 3, 1),
+            new Vector3(3, -3, 1)
+        };
+
+        int availableLines;
+        if (!_fieldScript.BorderPoints
+            .Any(point => point.x == position.x && point.y == position.y))
+        {
+            // Inner points
+            availableLines = 5;
+        }
+        else if (anglePositions.Contains(position))
+        {
+            // Angle points
+            availableLines = 1;
+        } 
+        else
+        {
+            // Other border points
+            availableLines = 3;
         }
 
-        fieldScript._player1 = !fieldScript._player1;
-        fieldScript.DrawPlayerSprite();
+        var usedLinesCount = _fieldScript.LinesDict[position].Count;
+
+        return usedLinesCount + 1 >= availableLines;
+    }
+
+    private bool IsLineExisted(Vector3 oldPosition, Vector3 newPosition)
+    {
+        return _fieldScript.LinesDict[oldPosition].Contains(newPosition)
+            || _fieldScript.LinesDict[newPosition].Contains(oldPosition);
     }
 }

@@ -12,9 +12,11 @@ public class FieldScript : MonoBehaviour
     private Sprite _p2Sprite;
     private SpriteRenderer _playerSpriteRenderer;
 
-    public List<Vector3> _activePoints = new();
-    public LineRenderer _lineRenderer;
-    public bool _player1 = true;
+    public bool Player1 { get; set; } = true;
+    public LineRenderer LineRenderer { get; set; }
+    public List<Vector3> Points { get; set; } = new();
+    public List<Vector3> BorderPoints { get; set; } = new();
+    public Dictionary<Vector3, List<Vector3>> LinesDict { get; set; } = new();
 
     [RuntimeInitializeOnLoadMethod]
     private void Start()
@@ -57,13 +59,11 @@ public class FieldScript : MonoBehaviour
             _playerSpriteRenderer.transform.position = new Vector3(-4.5f, 4.5f, 1);
         }
 
-        _playerSpriteRenderer.sprite = _player1 ? _p1Sprite : _p2Sprite;
+        _playerSpriteRenderer.sprite = Player1 ? _p1Sprite : _p2Sprite;
     }
 
     private void DrawFieldDots()
     {
-        _activePoints.Add(new Vector3(0.05f, 0.05f, 1));
-
         for (var x = -3; x < 4; x++)
         {
             for (var y = -3; y < 4; y++)
@@ -82,24 +82,33 @@ public class FieldScript : MonoBehaviour
         gameObject.transform.SetParent(_parent.transform, true);
 
         gameObject.AddComponent<PointScript>();
-        gameObject.AddComponent<CircleCollider2D>();
         gameObject.AddComponent<SpriteRenderer>();
 
+        var collider = gameObject.AddComponent<CircleCollider2D>();
+        collider.offset = new Vector2(0.05f, 0.05f);
+        collider.radius = 0.40f;
+
         var sprite = _grayCircleSprite;
+        var position = new Vector3(x, y, 1);
         if (x == 0 && y == 0)
         {
-            _lineRenderer = gameObject.AddComponent<LineRenderer>();
-            _lineRenderer.material = _material;
-            _lineRenderer.startColor = _lineRenderer.endColor = Color.blue;
-            _lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
-            _lineRenderer.startWidth = _lineRenderer.endWidth = 0.1f;
+            LineRenderer = gameObject.AddComponent<LineRenderer>();
+            LineRenderer.material = _material;
+            LineRenderer.startColor = LineRenderer.endColor = Color.blue;
+            LineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
+            LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
+            LineRenderer.numCornerVertices = 5;
+            LineRenderer.positionCount = 1;
+            LineRenderer.SetPosition(0, position);
 
             sprite = _blackCircleSprite;
         }
 
         var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprite;
-        spriteRenderer.transform.position = new Vector3(x, y, 1);
+        spriteRenderer.transform.position = position;
+
+        LinesDict.Add(position, new List<Vector3>());
     }
 
     private void DrawFieldBorders()
@@ -112,6 +121,7 @@ public class FieldScript : MonoBehaviour
         lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
         lineRenderer.startWidth = lineRenderer.endWidth = 0.1f;
         lineRenderer.positionCount = 0;
+        lineRenderer.numCornerVertices = 5;
 
         var index = 0;
         void DrawLine(int x, int y)
@@ -120,6 +130,8 @@ public class FieldScript : MonoBehaviour
 
             lineRenderer.positionCount++;
             lineRenderer.SetPosition(index++, point);
+
+            BorderPoints.Add(point);
         }
 
         var x = -3;
