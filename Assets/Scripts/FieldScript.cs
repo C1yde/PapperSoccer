@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using System.Threading;
 
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class FieldScript : MonoBehaviour
 {
@@ -50,7 +48,7 @@ public class FieldScript : MonoBehaviour
 
         var playerObject = new GameObject("player");
         _playerSpriteRenderer = playerObject.AddComponent<SpriteRenderer>();
-        _playerSpriteRenderer.transform.position = new Vector3(-4.5f, 4.5f, 1);
+        _playerSpriteRenderer.transform.position = new Vector3(-4.5f, 4.5f);
 
         DrawFieldDots();
         DrawFieldBorders();
@@ -71,7 +69,7 @@ public class FieldScript : MonoBehaviour
             new Rect(0, 0, goal.width, goal.height),
             new Vector2(0.9f, 0.9f));
         _playerSpriteRenderer = goalObject.AddComponent<SpriteRenderer>();
-        _playerSpriteRenderer.transform.position = new Vector3(2, 1, 0);
+        _playerSpriteRenderer.transform.position = new Vector3(2, 1);
         _playerSpriteRenderer.sprite = goalSprite;
     }
 
@@ -107,7 +105,7 @@ public class FieldScript : MonoBehaviour
         collider.radius = 0.40f;
 
         var sprite = GrayCircleSprite;
-        var position = new Vector3(x, y, 1);
+        var position = new Vector3(x, y);
         if (x == 0 && y == 0)
         {
             LineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -117,6 +115,7 @@ public class FieldScript : MonoBehaviour
             LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
             LineRenderer.numCornerVertices = 5;
             LineRenderer.positionCount = 1;
+            LineRenderer.sortingOrder = 1;
             LineRenderer.SetPosition(0, position);
 
             sprite = BallSprite;
@@ -125,6 +124,7 @@ public class FieldScript : MonoBehaviour
         var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprite;
         spriteRenderer.transform.position = position;
+        spriteRenderer.sortingOrder = 1;
 
         LinesDict.Add(position, new List<Vector3>());
     }
@@ -139,12 +139,13 @@ public class FieldScript : MonoBehaviour
         lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
         lineRenderer.startWidth = lineRenderer.endWidth = 0.1f;
         lineRenderer.positionCount = 0;
+        lineRenderer.sortingOrder = 1;
         lineRenderer.numCornerVertices = 5;
 
         var index = 0;
         void DrawLine(int x, int y)
         {
-            var point = new Vector3(x + 0.05f, y + 0.05f, 1);
+            var point = new Vector3(x + 0.05f, y + 0.05f);
 
             lineRenderer.positionCount++;
             lineRenderer.SetPosition(index++, point);

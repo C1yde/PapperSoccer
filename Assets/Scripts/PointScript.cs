@@ -20,8 +20,8 @@ public class PointScript : MonoBehaviour
 
         _goalPoints = new List<Vector3>
         {
-            new Vector3(0, -4, 1),
-            new Vector3(0, 4, 1)
+            new Vector3(0, -4),
+            new Vector3(0, 4)
         };
     }
 
@@ -30,7 +30,7 @@ public class PointScript : MonoBehaviour
         var currentPosition = _spriteRenderer.transform.position;
         var lastPosition = _fieldScript.Points.Any()
             ? _fieldScript.Points.Last()
-            : new Vector3(0, 0, 1);
+            : new Vector3(0, 0);
 
         if (!IsNearPoint(currentPosition, lastPosition)
             || IsLineExisted(currentPosition, lastPosition)
@@ -53,7 +53,7 @@ public class PointScript : MonoBehaviour
     {
         var lastPosition = _fieldScript.Points.Any()
             ? _fieldScript.Points.Last()
-            : new Vector3(0, 0, 1);
+            : new Vector3(0, 0);
         if (position == lastPosition)
         {
             return;
@@ -77,17 +77,17 @@ public class PointScript : MonoBehaviour
 
         var lastPosition = _fieldScript.Points.Any()
             ? _fieldScript.Points.Last()
-            : new Vector3(0, 0, 1);
+            : new Vector3(0, 0);
         var newPosition = new Vector3(
             currentPosition.x + 0.05f,
-            currentPosition.y + 0.05f,
-            1);
+            currentPosition.y + 0.05f);
 
         if (currentPosition == lastPosition
             || !IsNearPoint(currentPosition, lastPosition)
             || IsPointFinished(currentPosition)
             || IsLineExisted(lastPosition, currentPosition)
-            || (IsBorderLine(currentPosition, lastPosition) && IsBorderLine(lastPosition, currentPosition)))
+            || (IsBorderLine(currentPosition, lastPosition) 
+                && IsBorderLine(lastPosition, currentPosition)))
         {
             return;
         }
@@ -120,10 +120,10 @@ public class PointScript : MonoBehaviour
     {
         var anglePositions = new List<Vector3>
         {
-            new Vector3(-3, -3, 1),
-            new Vector3(-3, 3, 1),
-            new Vector3(3, 3, 1),
-            new Vector3(3, -3, 1)
+            new Vector3(-3, -3),
+            new Vector3(-3, 3),
+            new Vector3(3, 3),
+            new Vector3(3, -3)
         };
 
         if (anglePositions.Contains(position))
@@ -158,7 +158,8 @@ public class PointScript : MonoBehaviour
 
     private bool IsPointChecked(Vector3 currentPosition, Vector3 lastPosition)
     {
-        return _fieldScript.LinesDict[currentPosition].Any() || IsBorderLine(currentPosition, lastPosition);
+        return _fieldScript.LinesDict[currentPosition].Any()
+            || IsBorderLine(currentPosition, lastPosition);
     }
 
     private bool IsBorderLine(Vector3 currentPosition, Vector3 lastPosition)
@@ -168,7 +169,9 @@ public class PointScript : MonoBehaviour
             return false;
         }
 
-        return ((lastPosition.x == 3 || lastPosition.x == -3) && (currentPosition.x == 3 || currentPosition.x == -3))
-            || ((lastPosition.y == 3 || lastPosition.y == -3) && (currentPosition.y == 3 || currentPosition.y == -3));
+        return ((lastPosition.x == 3 || lastPosition.x == -3) 
+                && (currentPosition.x == 3 || currentPosition.x == -3))
+            || ((lastPosition.y == 3 || lastPosition.y == -3) 
+                && (currentPosition.y == 3 || currentPosition.y == -3));
     }
 }
