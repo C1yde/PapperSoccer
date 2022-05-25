@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class PointScript : MonoBehaviour
+public class MovementScript : MonoBehaviour
 {
     private FieldScript _fieldScript;
     private SpriteRenderer _spriteRenderer;

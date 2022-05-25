@@ -6,6 +6,7 @@
     "com.unity.ide.rider": "3.0.13",
     "com.unity.ide.visualstudio": "2.0.15",
     "com.unity.ide.vscode": "1.2.5",
+    "com.unity.netcode.gameobjects": "file:C:/Repos/com.unity.netcode.gameobjects/com.unity.netcode.gameobjects",
     "com.unity.test-framework": "1.1.31",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.6.4",
@@ -42,5 +43,14 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "Network",
+      "url": "https://github.com/Unity-Technologies/com.unity.netcode.gameobjects",
+      "scopes": [
+        "1"
+      ]
+    }
+  ]
 }

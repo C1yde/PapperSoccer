@@ -46,7 +46,7 @@ public class FieldScript : MonoBehaviour
             new Rect(0, 0, p2.width, p2.height),
             new Vector2(0.64f, 0.64f));
 
-        var playerObject = new GameObject("player");
+        var playerObject = new GameObject("PlayerIcon");
         _playerSpriteRenderer = playerObject.AddComponent<SpriteRenderer>();
         _playerSpriteRenderer.transform.position = new Vector3(-4.5f, 4.5f);
 
@@ -63,7 +63,7 @@ public class FieldScript : MonoBehaviour
     public void DrawGoalSprite()
     {
         var goal = Resources.Load<Texture2D>("Sprites/goal");
-        var goalObject = new GameObject("goal");
+        var goalObject = new GameObject("GoalIcon");
         var goalSprite = Sprite.Create(
             goal,
             new Rect(0, 0, goal.width, goal.height),
@@ -97,7 +97,7 @@ public class FieldScript : MonoBehaviour
         var gameObject = new GameObject(x + ", " + y);
         gameObject.transform.SetParent(_parent.transform, true);
 
-        gameObject.AddComponent<PointScript>();
+        gameObject.AddComponent<MovementScript>();
         gameObject.AddComponent<SpriteRenderer>();
 
         var collider = gameObject.AddComponent<CircleCollider2D>();
@@ -116,7 +116,7 @@ public class FieldScript : MonoBehaviour
             LineRenderer.numCornerVertices = 5;
             LineRenderer.positionCount = 1;
             LineRenderer.sortingOrder = 1;
-            LineRenderer.SetPosition(0, position);
+            LineRenderer.SetPosition(0, new Vector3(0.05f, 0.05f));
 
             sprite = BallSprite;
         }
@@ -131,7 +131,7 @@ public class FieldScript : MonoBehaviour
 
     private void DrawFieldBorders()
     {
-        var borderDot = new GameObject("border");
+        var borderDot = new GameObject("BorderLine");
         var lineRenderer = borderDot.AddComponent<LineRenderer>();
 
         lineRenderer.material = _material;
