@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class FieldScript : MonoBehaviour
 {
-    private Canvas _parent;
+    private GameObject _parent;
     private Material _material;
     private Sprite _p1Sprite;
     private Sprite _p2Sprite;
@@ -13,9 +13,9 @@ public class FieldScript : MonoBehaviour
 
     public bool Player1 { get; set; } = true;
     public LineRenderer LineRenderer { get; set; }
-    public List<Vector3> Points { get; set; } = new();
-    public List<Vector3> BorderPoints { get; set; } = new();
-    public Dictionary<Vector3, List<Vector3>> LinesDict { get; set; } = new();
+    public List<(int x, int y)> Points { get; set; } = new();
+    public List<(int x, int y)> BorderPoints { get; set; } = new();
+    public Dictionary<(int x, int y), List<(int x, int y)>> LinesDict { get; set; } = new();
     public Sprite BallSprite { get; set; }
     public Sprite GrayCircleSprite { get; set; }
 
@@ -27,7 +27,7 @@ public class FieldScript : MonoBehaviour
         var p1 = Resources.Load<Texture2D>("Sprites/p1");
         var p2 = Resources.Load<Texture2D>("Sprites/p2");
 
-        _parent = GetComponent<Canvas>();
+        _parent = this.gameObject;
         _material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Particle.mat");
         BallSprite = Sprite.Create(
             ballTexture,
@@ -48,7 +48,9 @@ public class FieldScript : MonoBehaviour
 
         var playerObject = new GameObject("PlayerIcon");
         _playerSpriteRenderer = playerObject.AddComponent<SpriteRenderer>();
-        _playerSpriteRenderer.transform.position = new Vector3(-4.5f, 4.5f);
+        _playerSpriteRenderer.transform.position = new Vector3(-2.5f, 4.5f);
+
+        playerObject.transform.SetParent(_parent.transform, true);
 
         DrawFieldDots();
         DrawFieldBorders();
@@ -68,14 +70,10 @@ public class FieldScript : MonoBehaviour
             goal,
             new Rect(0, 0, goal.width, goal.height),
             new Vector2(0.9f, 0.9f));
-        _playerSpriteRenderer = goalObject.AddComponent<SpriteRenderer>();
-        _playerSpriteRenderer.transform.position = new Vector3(2, 1);
-        _playerSpriteRenderer.sprite = goalSprite;
-    }
+        var goalSpriteRenderer = goalObject.AddComponent<SpriteRenderer>();
 
-    IEnumerator<WaitForSeconds> Fade()
-    {
-        yield return new WaitForSeconds(2);
+        goalSpriteRenderer.transform.position = new Vector3(2, 1);
+        goalSpriteRenderer.sprite = goalSprite;
     }
 
     private void DrawFieldDots()
@@ -97,8 +95,8 @@ public class FieldScript : MonoBehaviour
         var gameObject = new GameObject(x + ", " + y);
         gameObject.transform.SetParent(_parent.transform, true);
 
-        gameObject.AddComponent<MovementScript>();
-        gameObject.AddComponent<SpriteRenderer>();
+        var script = gameObject.AddComponent<MovementScript>();
+        script.CurrentPosition = (x, y);
 
         var collider = gameObject.AddComponent<CircleCollider2D>();
         collider.offset = new Vector2(0.05f, 0.05f);
@@ -121,12 +119,12 @@ public class FieldScript : MonoBehaviour
             sprite = BallSprite;
         }
 
-        var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        var spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprite;
         spriteRenderer.transform.position = position;
         spriteRenderer.sortingOrder = 1;
 
-        LinesDict.Add(position, new List<Vector3>());
+        LinesDict.Add((x, y), new List<(int x, int y)>());
     }
 
     private void DrawFieldBorders()
@@ -150,7 +148,7 @@ public class FieldScript : MonoBehaviour
             lineRenderer.positionCount++;
             lineRenderer.SetPosition(index++, point);
 
-            BorderPoints.Add(point);
+            BorderPoints.Add((x, y));
         }
 
         var x = -3;
