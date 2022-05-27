@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,23 +11,64 @@ public class FieldScript : MonoBehaviour
     private Sprite _p2Sprite;
     private SpriteRenderer _playerSpriteRenderer;
 
-    public bool Player1 { get; set; } = true;
     public LineRenderer LineRenderer { get; set; }
-    public List<(int x, int y)> Points { get; set; } = new();
-    public List<(int x, int y)> BorderPoints { get; set; } = new();
-    public Dictionary<(int x, int y), List<(int x, int y)>> LinesDict { get; set; } = new();
+    public bool Player1 { get; set; }
+    public List<(int x, int y)> Points { get; set; }
+    public List<(int x, int y)> BorderPoints { get; set; }
+    public Dictionary<(int x, int y), List<(int x, int y)>> LinesDict { get; set; }
     public Sprite BallSprite { get; set; }
     public Sprite GrayCircleSprite { get; set; }
 
-    [RuntimeInitializeOnLoadMethod]
-    private void Start()
+    public void DrawPlayerSprite()
     {
+        _playerSpriteRenderer.sprite = Player1 ? _p1Sprite : _p2Sprite;
+    }
+
+    public void DrawGoalSprite()
+    {
+        var goal = Resources.Load<Texture2D>("Sprites/goal");
+        var goalObject = new GameObject("GoalIcon");
+        var goalSprite = Sprite.Create(
+            goal,
+            new Rect(0, 0, goal.width, goal.height),
+            new Vector2(0.9f, 0.9f));
+        var goalSpriteRenderer = goalObject.AddComponent<SpriteRenderer>();
+
+        goalSpriteRenderer.transform.position = new Vector3(2, 1);
+        goalSpriteRenderer.sprite = goalSprite;
+
+        SetParent(goalObject);
+    }
+
+    public void OnGameContainerDeactivate()
+    {
+        foreach (Transform child in _parent.transform)
+        {
+            if (child.gameObject.name == "Background UI"
+                || child.gameObject.name == "QuitButton")
+            {
+                continue;
+            }
+
+            Destroy(child.gameObject);
+        }
+
+        NetworkManager.Singleton.Shutdown();
+    }
+
+    public void OnGameContainerActivate()
+    {
+        Player1 = true;
+        Points = new();
+        BorderPoints = new();
+        LinesDict = new();
+
         var ballTexture = Resources.Load<Texture2D>("Sprites/ball");
         var grayCircleTexture = Resources.Load<Texture2D>("Sprites/gray_circle");
         var p1 = Resources.Load<Texture2D>("Sprites/p1");
         var p2 = Resources.Load<Texture2D>("Sprites/p2");
 
-        _parent = this.gameObject;
+        _parent = gameObject;
         _material = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Particle.mat");
         BallSprite = Sprite.Create(
             ballTexture,
@@ -50,30 +91,11 @@ public class FieldScript : MonoBehaviour
         _playerSpriteRenderer = playerObject.AddComponent<SpriteRenderer>();
         _playerSpriteRenderer.transform.position = new Vector3(-2.5f, 4.5f);
 
-        playerObject.transform.SetParent(_parent.transform, true);
+        SetParent(playerObject);
 
         DrawFieldDots();
         DrawFieldBorders();
         DrawPlayerSprite();
-    }
-
-    public void DrawPlayerSprite()
-    {
-        _playerSpriteRenderer.sprite = Player1 ? _p1Sprite : _p2Sprite;
-    }
-
-    public void DrawGoalSprite()
-    {
-        var goal = Resources.Load<Texture2D>("Sprites/goal");
-        var goalObject = new GameObject("GoalIcon");
-        var goalSprite = Sprite.Create(
-            goal,
-            new Rect(0, 0, goal.width, goal.height),
-            new Vector2(0.9f, 0.9f));
-        var goalSpriteRenderer = goalObject.AddComponent<SpriteRenderer>();
-
-        goalSpriteRenderer.transform.position = new Vector3(2, 1);
-        goalSpriteRenderer.sprite = goalSprite;
     }
 
     private void DrawFieldDots()
@@ -93,7 +115,7 @@ public class FieldScript : MonoBehaviour
     private void CreateDot(int x, int y)
     {
         var gameObject = new GameObject(x + ", " + y);
-        gameObject.transform.SetParent(_parent.transform, true);
+        SetParent(gameObject);
 
         var script = gameObject.AddComponent<MovementScript>();
         script.CurrentPosition = (x, y);
@@ -131,6 +153,8 @@ public class FieldScript : MonoBehaviour
     {
         var borderDot = new GameObject("BorderLine");
         var lineRenderer = borderDot.AddComponent<LineRenderer>();
+
+        SetParent(borderDot);
 
         lineRenderer.material = _material;
         lineRenderer.startColor = lineRenderer.endColor = Color.black;
@@ -215,9 +239,8 @@ public class FieldScript : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    private void Update()
+    private void SetParent(GameObject gameObject)
     {
-        
+        gameObject.transform.SetParent(_parent.transform, true);
     }
 }
